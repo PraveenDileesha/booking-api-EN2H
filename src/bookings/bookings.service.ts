@@ -6,12 +6,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { and, eq, SQL, sql } from 'drizzle-orm';
-import { DRIZZLE } from '../database/database.module';
-import * as schema from '../database/schema';
-import { ServicesService } from '../services/services.service';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
-import { BookingQueryDto } from './dto/booking-query.dto';
+import { DRIZZLE } from '../database/database.module.js';
+import * as schema from '../database/schema.js';
+import { ServicesService } from '../services/services.service.js';
+import { CreateBookingDto } from './dto/create-booking.dto.js';
+import { UpdateBookingStatusDto } from './dto/update-booking-status.dto.js';
+import { BookingQueryDto } from './dto/booking-query.dto.js';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 

@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { DRIZZLE } from '../database/database.module';
+import { AuthService } from './auth.service.js';
+import { DRIZZLE } from '../database/database.module.js';
 
 describe('AuthService', () => {
   let service: AuthService;

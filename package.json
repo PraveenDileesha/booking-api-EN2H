@@ -1,6 +1,7 @@
 {
   "name": "booking-api-EN2H",
   "version": "0.0.1",
+  "type": "module",
   "description": "",
   "author": "",
   "private": true,

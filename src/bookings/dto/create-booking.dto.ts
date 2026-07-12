@@ -6,7 +6,7 @@ import {
   IsUUID,
   Matches,
 } from 'class-validator';
-import { IsNotPastDate } from '../validators/is-not-past-date.validator';
+import { IsNotPastDate } from '../validators/is-not-past-date.validator.js';
 
 export class CreateBookingDto {
   @IsString()

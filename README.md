@@ -1,98 +1,302 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Booking Platform API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A REST API for managing business services and customer bookings, built with NestJS, PostgreSQL, and Drizzle ORM.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The API allows authenticated users to manage services while enabling customers to create bookings without requiring an account. It exposes a documented REST interface secured with JWT authentication and is designed to support containerized development and deployment.
 
-## Description
+## Architecture
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ pnpm install
+```
+ +--------------------+
+ |       Client       |
+ +---------+----------+
+           |
+      HTTPS / REST
+           |
+ +---------v----------+
+ |      NestJS API     |
+ |                     |
+ |     Controllers     |
+ |      Services       |
+ |   Authentication    |
+ +---------+----------+
+           |
+       Drizzle ORM
+           |
+ +---------v----------+
+ |     PostgreSQL      |
+ +--------------------+
 ```
 
-## Compile and run the project
+## Technology Stack
+
+| Component | Technology |
+|---|---|
+| Framework | NestJS (TypeScript) |
+| Database | PostgreSQL |
+| ORM | Drizzle ORM |
+| Authentication | JWT (Access & Refresh Tokens) |
+| Authorization | Passport.js |
+| Validation | class-validator, class-transformer |
+| API Documentation | Swagger (OpenAPI) |
+| Containerization | Docker & Docker Compose |
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20 or later
+- pnpm
+- Docker & Docker Compose (recommended)
+
+A local PostgreSQL installation may be used instead of Docker.
+
+### Quick Start (Local Development)
+
+The full sequence to get the API running locally, end to end:
 
 ```bash
-# development
-$ pnpm run start
+# 1. Clone and install dependencies
+git clone <repository-url>
+cd booking-api-EN2H
+pnpm install
 
-# watch mode
-$ pnpm run start:dev
+# 2. Set up environment variables
+cp .env.example .env
+# then edit .env and fill in real values (see Configuration below)
 
-# production mode
-$ pnpm run start:prod
+# 3. Start PostgreSQL (Docker)
+docker compose up -d postgres
+
+# 4. Apply database migrations
+pnpm run db:migrate
+
+# 5. Start the API in watch mode
+pnpm run start:dev
 ```
 
-## Run tests
+The API is now running at `http://localhost:3000`, with interactive docs at `http://localhost:3000/api-docs`.
+
+Each step is explained in more detail below.
+
+### Installation
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+git clone <repository-url>
+cd booking-api-EN2H
+pnpm install
 ```
 
-## Deployment
+### Configuration
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Create a local environment file.
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+cp .env.example .env
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+| Variable | Description |
+|---|---|
+| `PORT` | Application port |
+| `DB_USER` | PostgreSQL username |
+| `DB_PASSWORD` | PostgreSQL password |
+| `DB_NAME` | PostgreSQL database |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret used to sign access tokens |
+| `JWT_REFRESH_SECRET` | Secret used to sign refresh tokens |
 
-## Resources
+Generate secure JWT secrets:
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+openssl rand -base64 32
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Database
 
-## Support
+### Start PostgreSQL
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Using Docker:
 
-## Stay in touch
+```bash
+docker compose up -d postgres
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Alternatively, configure a local PostgreSQL instance that matches the values in `.env`.
+
+### Run Migrations
+
+```bash
+pnpm run db:migrate
+```
+
+Generate a new migration after modifying the schema:
+
+```bash
+pnpm run db:generate
+```
+
+## Running the Application
+
+### Development
+
+For day-to-day development, run PostgreSQL in Docker but the API natively — this gives the fastest feedback loop (instant hot-reload on file changes), which a fully Dockerized API doesn't provide as quickly.
+
+```bash
+docker compose up -d postgres   # database only
+pnpm run start:dev              # API runs natively on your machine
+```
+
+The API will be available at `http://localhost:3000`.
+
+### Docker (full stack)
+
+To run both the database and the API in containers — useful for verifying the production-style build, or if you don't want Node.js installed locally at all:
+
+```bash
+docker compose up --build
+```
+
+This command builds the application image, starts PostgreSQL, waits for it to be healthy, applies database migrations automatically, and launches the API — all in one command.
+
+**Note:** if you already have the API running locally via `pnpm run start:dev`, stop it first (or stop the local process) before running this, since both will try to use port 3000.
+
+### Production
+
+```bash
+pnpm run build
+pnpm run start:prod
+```
+
+## API Documentation
+
+Swagger UI is available once the application is running.
+
+```
+http://localhost:3000/api-docs
+```
+
+Use the **Authorize** button and provide the access token returned by `POST /auth/login` to access protected endpoints.
+
+## Authentication
+
+Authentication is based on JWT access and refresh tokens.
+
+| Endpoint | Description |
+|---|---|
+| `POST /auth/register` | Register a new user |
+| `POST /auth/login` | Authenticate a user and receive access and refresh tokens |
+| `POST /auth/refresh` | Exchange a refresh token for a new access token |
+
+Protected endpoints require the following header:
+
+```
+Authorization: Bearer <access_token>
+```
+
+## API Overview
+
+### Services
+
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | `/services` | Protected |
+| GET | `/services` | Public |
+| GET | `/services/:id` | Public |
+| PATCH | `/services/:id` | Protected |
+| DELETE | `/services/:id` | Protected |
+
+### Bookings
+
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | `/bookings` | Public |
+| GET | `/bookings` | Protected |
+| GET | `/bookings/:id` | Public |
+| PATCH | `/bookings/:id/status` | Protected |
+| PATCH | `/bookings/:id/cancel` | Protected |
+
+## Core Functionality
+
+- JWT authentication using access and refresh tokens
+- CRUD operations for services
+- Customer booking workflow
+- Booking status transitions
+- Search, filtering, and pagination
+- Duplicate booking prevention
+- Optimistic concurrency control for booking status updates
+- Request validation
+- OpenAPI documentation
+
+## Project Structure
+
+```
+src/
+├── auth/          # Authentication
+├── bookings/       # Booking management
+├── services/        # Service management
+├── database/          # Database schema and connection
+├── common/              # Shared utilities, DTOs and exception handling
+├── app.controller.ts
+└── main.ts
+
+drizzle/
+└── migrations/
+```
+
+## Design Decisions
+
+### Service Ownership
+
+Services store the creator's identifier, although ownership restrictions are not currently enforced. Any authenticated user can manage services.
+
+### Booking Access
+
+Creating a booking and retrieving an individual booking are public operations. Listing and managing bookings require authentication.
+
+### Booking State Model
+
+Booking status transitions follow a controlled workflow. Both `PENDING` and `CONFIRMED` bookings may be cancelled; `CANCELLED` and `COMPLETED` are terminal states.
+
+```
+PENDING → CONFIRMED → COMPLETED
+   │           │
+   └───→ CANCELLED ←───┘
+```
+
+### Identifier Strategy
+
+UUIDs are used for all primary keys instead of sequential identifiers.
+
+### Referential Integrity
+
+Services with associated bookings cannot be deleted, preserving booking history.
+
+### Authentication Strategy
+
+The API uses symmetric JWT signing (HS256) with separate secrets for access and refresh tokens.
+
+### Refresh Tokens
+
+Refresh tokens remain valid until expiration and are not currently revocable.
+
+## Current Limitations
+
+- Service ownership is not enforced.
+- The `isActive` field on services is not used when creating bookings.
+- Refresh tokens cannot be revoked before expiration.
+- Role-based authorization is not implemented.
+
+## Roadmap
+
+Planned improvements include:
+
+- Role-based access control
+- Service ownership enforcement
+- Refresh token revocation
+- Rate limiting for authentication and booking endpoints
+- Expanded automated test coverage
+- Relevance-based search ranking
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is privately licensed and was developed as part of a technical assessment. It is not currently published under an open-source license.

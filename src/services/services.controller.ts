@@ -18,11 +18,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ServicesService } from './services.service';
-import { CreateServiceDto } from './dto/create-service.dto';
-import { UpdateServiceDto } from './dto/update-service.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { ServicesService } from './services.service.js';
+import { CreateServiceDto } from './dto/create-service.dto.js';
+import { UpdateServiceDto } from './dto/update-service.dto.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { PaginationDto } from '../common/dto/pagination.dto.js';
 import { ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Services')

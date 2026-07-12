@@ -1,14 +1,15 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { DRIZZLE } from '../database/database.module';
-import * as schema from '../database/schema';
-import { CreateServiceDto } from './dto/create-service.dto';
-import { UpdateServiceDto } from './dto/update-service.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { DRIZZLE } from '../database/database.module.js';
+import * as schema from '../database/schema.js';
+import { CreateServiceDto } from './dto/create-service.dto.js';
+import { UpdateServiceDto } from './dto/update-service.dto.js';
+import { PaginationDto } from '../common/dto/pagination.dto.js';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 @Injectable()
 export class ServicesService {
-  constructor(@Inject(DRIZZLE) private readonly db: any) {}
+  constructor(@Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>) { }
 
   async create(dto: CreateServiceDto, userId: string) {
     const [newService] = await this.db
@@ -90,7 +91,7 @@ export class ServicesService {
       if (error?.cause?.code === '23503') {
         throw new ConflictException(
           'Cannot delete this service because it has existing bookings. ' +
-            'Services with booking history cannot be removed to preserve records.',
+          'Services with booking history cannot be removed to preserve records.',
         );
       }
       throw error;

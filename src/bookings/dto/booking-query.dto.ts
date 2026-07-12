@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { PaginationDto } from '../../common/dto/pagination.dto';
-import { BookingStatusDto } from './update-booking-status.dto';
+import { PaginationDto } from '../../common/dto/pagination.dto.js';
+import { BookingStatusDto } from './update-booking-status.dto.js';
 
 export class BookingQueryDto extends PaginationDto {
   @IsOptional()

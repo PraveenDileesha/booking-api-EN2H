@@ -16,13 +16,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { BookingsService } from './bookings.service';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
-import { BookingQueryDto } from './dto/booking-query.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BookingsService } from './bookings.service.js';
+import { CreateBookingDto } from './dto/create-booking.dto.js';
+import { UpdateBookingStatusDto } from './dto/update-booking-status.dto.js';
+import { BookingQueryDto } from './dto/booking-query.dto.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ApiQuery } from '@nestjs/swagger';
-import { BookingStatusDto } from './dto/update-booking-status.dto';
+import { BookingStatusDto } from './dto/update-booking-status.dto.js';
 
 @ApiTags('Bookings')
 @Controller('bookings')

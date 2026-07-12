@@ -7,11 +7,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { eq } from 'drizzle-orm';
-import { DRIZZLE } from '../database/database.module';
-import * as schema from '../database/schema';
+import { DRIZZLE } from '../database/database.module.js';
+import * as schema from '../database/schema.js';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class AuthService {
     @Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   private async signAccessToken(payload: { sub: string; email: string }) {
     return this.jwtService.signAsync(payload, { expiresIn: '15m' });
@@ -29,42 +29,42 @@ export class AuthService {
   private async signRefreshToken(payload: { sub: string; email: string }) {
     const secret = this.configService.get<string>('JWT_REFRESH_SECRET');
     return this.jwtService.signAsync(
-        { ...payload, type: 'refresh' },
-        { expiresIn: '7d', secret },
+      { ...payload, type: 'refresh' },
+      { expiresIn: '7d', secret },
     );
   }
 
   async register(dto: RegisterDto) {
     const existingUser = await this.db.query.users.findFirst({
-        where: eq(schema.users.email, dto.email),
+      where: eq(schema.users.email, dto.email),
     });
-    
+
     if (existingUser) {
-        throw new ConflictException('A user with this email already exists');
+      throw new ConflictException('A user with this email already exists');
     }
-    
+
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    
+
     try {
-        const [newUser] = await this.db
+      const [newUser] = await this.db
         .insert(schema.users)
         .values({
-            email: dto.email,
-            password: hashedPassword,
+          email: dto.email,
+          password: hashedPassword,
         })
         .returning();
-        
-        const { password, ...safeUser } = newUser;
-        return safeUser;
+
+      const { password, ...safeUser } = newUser;
+      return safeUser;
     } catch (err: any) {
-        const code = err?.cause?.code ?? err?.code;
-        if (code === '23505') {
-            throw new ConflictException('A user with this email already exists');
-        }
-        throw err;
+      const code = err?.cause?.code ?? err?.code;
+      if (code === '23505') {
+        throw new ConflictException('A user with this email already exists');
+      }
+      throw err;
     }
   }
-  
+
 
   async login(dto: LoginDto) {
     const user = await this.db.query.users.findFirst({
@@ -90,22 +90,21 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
-        const secret = this.configService.get<string>('JWT_REFRESH_SECRET');
-        const payload = await this.jwtService.verifyAsync(refreshToken, { secret });
-        
-        if (payload.type !== 'refresh') {
-            throw new UnauthorizedException('Invalid refresh token');
-        }
-        
-        const accessToken = await this.signAccessToken({
-            sub: payload.sub,
-            email: payload.email,
-        });
-        return { accessToken };
-    } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        console.log('VERIFY ERROR:', message);
+      const secret = this.configService.get<string>('JWT_REFRESH_SECRET');
+      const payload = await this.jwtService.verifyAsync(refreshToken, { secret });
+
+      if (payload.type !== 'refresh') {
         throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const accessToken = await this.signAccessToken({
+        sub: payload.sub,
+        email: payload.email,
+      });
+      return { accessToken };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new UnauthorizedException('Invalid refresh token');
     }
   }
 }
