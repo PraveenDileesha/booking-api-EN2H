@@ -16,6 +16,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { BookingsService } from './bookings.service.js';
 import { CreateBookingDto } from './dto/create-booking.dto.js';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto.js';
@@ -27,9 +28,11 @@ import { BookingStatusDto } from './dto/update-booking-status.dto.js';
 @ApiTags('Bookings')
 @Controller('bookings')
 export class BookingsController {
-  constructor(private readonly bookingsService: BookingsService) {}
+  constructor(private readonly bookingsService: BookingsService) { }
 
   // Public — "Customers can create bookings without authentication"
+  // Stricter limit than the global default (10/min) since this endpoint is public and unauthenticated
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new booking (public, no auth required)' })
@@ -37,6 +40,7 @@ export class BookingsController {
   @ApiResponse({ status: 400, description: 'Validation failed (e.g. past date)' })
   @ApiResponse({ status: 404, description: 'Referenced service does not exist' })
   @ApiResponse({ status: 409, description: 'Duplicate booking for this service/date/time' })
+  @ApiResponse({ status: 429, description: 'Too many booking attempts, try again later' })
   create(@Body() dto: CreateBookingDto) {
     return this.bookingsService.create(dto);
   }
@@ -59,7 +63,6 @@ export class BookingsController {
   }
 
   // Public — assumption: a customer should be able to look up their own
-  // booking by ID (e.g. a confirmation link) without needing to log in.
   @Get(':id')
   @ApiOperation({ summary: 'Get a single booking by ID (public)' })
   @ApiResponse({ status: 200, description: 'Returns the requested booking' })
