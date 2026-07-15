@@ -32,7 +32,7 @@ export class BookingsController {
 
   // Public — "Customers can create bookings without authentication"
   // Stricter limit than the global default (10/min) since this endpoint is public and unauthenticated
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new booking (public, no auth required)' })

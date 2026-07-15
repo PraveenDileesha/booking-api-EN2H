@@ -21,7 +21,7 @@ export class AuthController {
   }
 
   // Stricter limit than the global default
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 8, ttl: 900000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Log in and receive access + refresh tokens' })

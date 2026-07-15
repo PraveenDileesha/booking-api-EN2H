@@ -18,7 +18,7 @@ import { BookingsModule } from './bookings/bookings.module.js';
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 10, // max 10 requests per IP per window, applied globally by default
+        limit: 80, // max 80 requests per IP per window, applied globally by default
       },
     ]),
     DatabaseModule,
